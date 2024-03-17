@@ -5,7 +5,7 @@
   "devDependencies": {
     "@create-figma-plugin/build": "^3.1.0",
     "@create-figma-plugin/tsconfig": "^3.1.0",
-    "@figma/plugin-typings": "1.82.0",
+    "@figma/plugin-typings": "*",
     "typescript": ">=4"
   },
   "scripts": {
@@ -18,6 +18,13 @@
     ],
     "id": "hello-world",
     "name": "Present ▶️",
-    "main": "src/main.ts"
+    "main": "src/main.ts",
+    "documentAccess": "dynamic-page",
+    "networkAccess": {
+      "allowedDomains": [
+        "none"
+      ],
+      "reasoning": "Present ▶️ does not make any network requests."
+    }
   }
 }
