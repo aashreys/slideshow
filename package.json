@@ -14,7 +14,7 @@
   },
   "figma-plugin": {
     "editorType": [ "figma" ],
-    "id": "hello-world",
+    "id": "1352106916614995463",
     "name": "Create Slideshow",
     "main": "src/main.ts",
     "documentAccess": "dynamic-page",
