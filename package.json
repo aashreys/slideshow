@@ -13,18 +13,16 @@
     "watch": "build-figma-plugin --typecheck --watch"
   },
   "figma-plugin": {
-    "editorType": [
-      "figma"
-    ],
+    "editorType": [ "figma" ],
     "id": "hello-world",
-    "name": "Present ▶️",
+    "name": "Create Slideshow",
     "main": "src/main.ts",
     "documentAccess": "dynamic-page",
     "networkAccess": {
       "allowedDomains": [
         "none"
       ],
-      "reasoning": "Present ▶️ does not make any network requests."
+      "reasoning": "Create Slideshow does not make any network requests."
     }
   }
 }

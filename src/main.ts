@@ -1,41 +1,26 @@
-import { setRelaunchButton } from '@create-figma-plugin/utilities'
-
 export default function() {
   const selection = figma.currentPage.selection
   let frames: FrameNode[] = []
-  if (selection.length > 0) {
-    frames = getFrames(selection)
-    
-  }
-  else {
-    figma.closePlugin('Please select frames to present')
-  }
+
+  if (selection.length > 0) frames = getFrames(selection)
+  else figma.closePlugin('Please select frames to create a slideshow')
 
   if (frames.length > 1) {
     frames.sort((a, b) => a.y === b.y ? a.x - b.x : a.y - b.y)
-    setPresentationInteractions(frames).finally(() => {
+    addSlideshowInteractions(frames).then(() => {
       setFlowStartingPointIfNotSet(frames[0])
-      figma.notify('🎉 Created presentation!', {
-        onDequeue: () => figma.closePlugin(),
-        button: {
-          text: 'Open',
-          action: () => { }
-          }
-        }
-      )
+      figma.closePlugin('🎉')
+    }).catch((e) => {
+      figma.closePlugin()
+      console.error('Create Slideshow: an error occurred')
+      console.error(e)
     })
   }
-  else {
-    figma.closePlugin('Please select two or more frames to present')
-  }
+  else figma.closePlugin('Please select two or more frames to create a slideshow')
 }
 
 function getFrames(nodes: readonly SceneNode[]): FrameNode[] {
-  const frames: FrameNode[] = []
-  for (let node of nodes) {
-    if (node.type === 'FRAME') frames.push(node)
-  }
-  return frames
+  return nodes.filter((node) => node.type === 'FRAME') as FrameNode[]
 }
 
 function createMatrix(frames: FrameNode[]): FrameNode[][] {
@@ -62,7 +47,7 @@ function removeDuplicates<T>(array: Array<T>): Array<T> {
   return array.filter((value, index) => array.indexOf(value) === index)
 }
 
-async function setPresentationInteractions(frames: FrameNode[]) {
+async function addSlideshowInteractions(frames: FrameNode[]) {
   for (let i = 0; i < frames.length; i++) {
     const reactions: Reaction[] = clone(frames[i].reactions)
     if (i === 0) {
@@ -84,7 +69,7 @@ function setFlowStartingPointIfNotSet(frame: FrameNode) {
     flows.push(
       {
         nodeId: frame.id,
-        name: 'Presentation ' + (flows.length + 1)
+        name: 'Slideshow ' + (flows.length + 1)
       }
     );
     figma.currentPage.flowStartingPoints = flows;
@@ -97,7 +82,7 @@ function createNextReaction(target: FrameNode): Reaction[] {
     destinationId: target.id,
     navigation: "NAVIGATE",
     transition: createTransition(),
-    preserveScrollPosition: false,
+    preserveScrollPosition: false
   }
   return [
     {
@@ -105,39 +90,7 @@ function createNextReaction(target: FrameNode): Reaction[] {
       trigger: {
         type: "ON_KEY_DOWN",
         device: "KEYBOARD",
-        keyCodes: [68],
-      }
-    },
-    {
-      actions: [action],
-      trigger: {
-        type: "ON_KEY_DOWN",
-        device: "KEYBOARD",
         keyCodes: [39],
-      }
-    },
-    {
-      actions: [action],
-      trigger: {
-        type: "ON_KEY_DOWN",
-        device: "KEYBOARD",
-        keyCodes: [39],
-      }
-    },
-    {
-      actions: [action],
-      trigger: {
-        type: "ON_KEY_DOWN",
-        device: "KEYBOARD",
-        keyCodes: [32],
-      }
-    },
-    {
-      actions: [action],
-      trigger: {
-        type: "ON_KEY_DOWN",
-        device: "KEYBOARD",
-        keyCodes: [13],
       }
     }
   ]
@@ -152,14 +105,6 @@ function createPrevReaction(target: FrameNode): Reaction[] {
     preserveScrollPosition: false,
   }
   return [
-    {
-      actions: [action],
-      trigger: {
-        type: "ON_KEY_DOWN",
-        device: "KEYBOARD",
-        keyCodes: [65],
-      }
-    },
     {
       actions: [action],
       trigger: {
