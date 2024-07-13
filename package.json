@@ -6,7 +6,7 @@
     "@create-figma-plugin/build": "^3.1.0",
     "@create-figma-plugin/tsconfig": "^3.1.0",
     "@figma/plugin-typings": "*",
-    "typescript": ">=4"
+    "typescript": "^5"
   },
   "scripts": {
     "build": "build-figma-plugin --typecheck --minify",
@@ -22,7 +22,7 @@
       "allowedDomains": [
         "none"
       ],
-      "reasoning": "Create Slideshow does not make any network requests."
+      "reasoning": "Create Slideshow works locally in your file. It does not make any network requests."
     }
   }
 }
