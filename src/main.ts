@@ -140,7 +140,8 @@ function clone(val: any): any {
     } else {
       let o = {}
       for (const key in val) {
-        o[key] = clone(val[key])
+        // @ts-ignore
+        o[key] = clone(val[key]) 
       }
       return o
     }
