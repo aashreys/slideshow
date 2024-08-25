@@ -1,22 +1,31 @@
-export default function() {
+const TRANSITION: Transition = {
+  type: "DISSOLVE",
+  easing: { type: "EASE_OUT" },
+  duration: 0.2
+}
+
+export default async function() {
   const selection = figma.currentPage.selection
   let frames: FrameNode[] = []
 
   if (selection.length > 0) frames = getFrames(selection)
-  else figma.closePlugin('Please select frames to create a slideshow')
+  else figma.closePlugin('Please select a few frames to create a slideshow')
 
-  if (frames.length > 1) {
-    frames.sort((a, b) => a.y === b.y ? a.x - b.x : a.y - b.y)
-    addSlideshowInteractions(frames).then(() => {
+  try {
+    if (frames.length > 0) {
+      if (frames.length > 1) {
+        frames.sort((a, b) => a.y === b.y ? a.x - b.x : a.y - b.y)
+        await addSlideshowInteractions(frames)
+      }
       setFlowStartingPointIfNotSet(frames[0])
-      figma.closePlugin('🎉')
-    }).catch((e) => {
-      figma.closePlugin()
-      console.error('Create Slideshow: an error occurred')
-      console.error(e)
-    })
+      figma.closePlugin('Slideshow created  🎉')
+    } else {
+      figma.closePlugin('Please select a few frames to create a slideshow')
+    }
   }
-  else figma.closePlugin('Please select two or more frames to create a slideshow')
+  catch (e) {
+    figma.closePlugin('An error occurred: ' + e)
+  }
 }
 
 function getFrames(nodes: readonly SceneNode[]): FrameNode[] {
@@ -51,7 +60,7 @@ async function addSlideshowInteractions(frames: FrameNode[]) {
   for (let i = 0; i < frames.length; i++) {
     const reactions: Reaction[] = clone(frames[i].reactions)
     if (i === 0) {
-      reactions.push(...createNextReaction(frames[i+1]))
+      reactions.push(...createNextReaction(frames[i + 1]))
     } else if (i === frames.length - 1) {
       reactions.push(...createPrevReaction(frames[i - 1]))
     } else {
@@ -81,7 +90,7 @@ function createNextReaction(target: FrameNode): Reaction[] {
     type: "NODE",
     destinationId: target.id,
     navigation: "NAVIGATE",
-    transition: createTransition(),
+    transition: TRANSITION,
     preserveScrollPosition: false
   }
   return [
@@ -101,7 +110,7 @@ function createPrevReaction(target: FrameNode): Reaction[] {
     type: "NODE",
     destinationId: target.id,
     navigation: "NAVIGATE",
-    transition: createTransition(),
+    transition: TRANSITION,
     preserveScrollPosition: false,
   }
   return [
@@ -114,14 +123,6 @@ function createPrevReaction(target: FrameNode): Reaction[] {
       }
     }
   ]
-}
-
-function createTransition(): Transition {
-  return {
-    type: "DISSOLVE",
-    easing: { type: "EASE_OUT" },
-    duration: 0.2
-  }
 }
 
 function clone(val: any): any {
